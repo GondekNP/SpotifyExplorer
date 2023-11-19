@@ -16,7 +16,7 @@ services:
   app:
     depends_on:
       - postgres_db
-    build: ./app
+    build: ./src
     restart: on-failure
     env_file: ./.env
     ports:
