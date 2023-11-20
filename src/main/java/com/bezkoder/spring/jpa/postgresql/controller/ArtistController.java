@@ -31,7 +31,10 @@ public class ArtistController {
 
 	@Autowired
 	ArtistRepository artistRepository;
-	String spotifySecret = System.getenv("SPOTIFY_SECRET");
+
+	@Autowired
+	private SpotifyClient spotifyClient;
+
 	@GetMapping("/artists/{artistId}")
 	public ResponseEntity<Artist> getArtistByArtistId(@PathVariable("artistId") String artistId){
 		try {
@@ -42,13 +45,12 @@ public class ArtistController {
 			if (artists.isEmpty()) {
 
 				// Instantiate the client and create the get artist request
-				SpotifyClient spotifyClient = new SpotifyClient("2fa46b7b82c743b6ade535691e037065", this.spotifySecret);
-				se.michaelthelin.spotify.model_objects.specification.Artist artist_response = spotifyClient.getArtistByArtistId_Sync(artistId);
+				se.michaelthelin.spotify.model_objects.specification.Artist artist_response = this.spotifyClient.getArtistByArtistId_Sync(artistId);
 
 				// Convert the Image model from java spotify api to simpler list of string urls
 				List<String> artistImageUrls = new ArrayList<String>();
 				for (Image image : artist_response.getImages()){
-					artistImageUrls.add(image.toString());
+					artistImageUrls.add(image.getUrl());
 				}
 
 				// Finally, save the artist into our postgres db using JPA
