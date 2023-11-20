@@ -1,6 +1,7 @@
 package com.bezkoder.spring.jpa.postgresql.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bezkoder.spring.jpa.postgresql.model.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Image;
 import com.bezkoder.spring.jpa.postgresql.repository.ArtistRepository;
-
+import com.bezkoder.spring.jpa.postgresql.services.SpotifyClient;
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
@@ -29,14 +31,37 @@ public class ArtistController {
 
 	@Autowired
 	ArtistRepository artistRepository;
-
+	String spotifySecret = System.getenv("SPOTIFY_SECRET");
 	@GetMapping("/artists/{artistId}")
 	public ResponseEntity<Artist> getArtistByArtistId(@PathVariable("artistId") String artistId){
 		try {
 
 			List<Artist> artists = artistRepository.findArtistByArtistId(artistId);
+
+			// If we don't already have this artist
 			if (artists.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+				// Instantiate the client and create the get artist request
+				SpotifyClient spotifyClient = new SpotifyClient("2fa46b7b82c743b6ade535691e037065", this.spotifySecret);
+				se.michaelthelin.spotify.model_objects.specification.Artist artist_response = spotifyClient.getArtistByArtistId_Sync(artistId);
+
+				// Convert the Image model from java spotify api to simpler list of string urls
+				List<String> artistImageUrls = new ArrayList<String>();
+				for (Image image : artist_response.getImages()){
+					artistImageUrls.add(image.toString());
+				}
+
+				// Finally, save the artist into our postgres db using JPA
+				Artist _artist = artistRepository
+					.save(new Artist(
+							artist_response.getName(),
+							artistId,
+							Arrays.stream(artist_response.getGenres()).toList(),
+							artistImageUrls
+					));
+
+				return new ResponseEntity<>(_artist, HttpStatus.CREATED);
+
 			}
 
 			return new ResponseEntity<>(artists.get(0), HttpStatus.OK);

@@ -1,4 +1,4 @@
-package spotify.etl;
+package com.bezkoder.spring.jpa.postgresql.services;
 
 import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -7,6 +7,8 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 import org.apache.hc.core5.http.ParseException;
 
@@ -40,6 +42,21 @@ public class SpotifyClient {
             final Track[] tracks = getArtistsTopTracksRequest.execute();
             System.out.println("Length: " + tracks.length);
             return tracks;
+        }
+        catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Artist getArtistByArtistId_Sync(String artistId) {
+        final GetArtistRequest getArtistRequest = spotifyApi
+                .getArtist(artistId)
+                .build();
+        try {
+            final Artist artist = getArtistRequest.execute();
+            System.out.println("Found artist: " + artist.getName());
+            return artist;
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
