@@ -8,5 +8,5 @@ import com.bezkoder.spring.jpa.postgresql.model.Artist;
 
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
   List<Artist> findArtistByArtistId(String artistId);
-
+  void deleteArtistByArtistId(String artistId);
 }

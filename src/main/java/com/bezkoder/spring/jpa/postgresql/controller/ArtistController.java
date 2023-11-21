@@ -75,9 +75,9 @@ public class ArtistController {
     }
 
     @DeleteMapping("/artists/{id}")
-    public ResponseEntity<HttpStatus> deleteArtist(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteArtist(@PathVariable("id") String artistId) {
         try {
-            artistRepository.deleteById(id);
+            artistRepository.deleteArtistByArtistId(artistId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
