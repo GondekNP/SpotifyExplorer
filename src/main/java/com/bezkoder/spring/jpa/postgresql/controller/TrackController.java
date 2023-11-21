@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bezkoder.spring.jpa.postgresql.model.Artist;
 import com.bezkoder.spring.jpa.postgresql.model.Track;
 import com.bezkoder.spring.jpa.postgresql.repository.TrackRepository;
+import com.bezkoder.spring.jpa.postgresql.repository.ArtistRepository;
 import com.bezkoder.spring.jpa.postgresql.services.SpotifyClient;
 
 @CrossOrigin(origins = "http://localhost:8081")
@@ -34,15 +35,34 @@ public class TrackController {
     TrackRepository trackRepository;
 
     @Autowired
+    ArtistRepository artistRepository;
+
+    @Autowired
     private SpotifyClient spotifyClient;
 
     @GetMapping("/tracks/byArtist/{artistId}/{countryCode}")
-    public ResponseEntity<Track[]> getTopTracksByArtist(@PathVariable("artistId") String artistId, @PathVariable CountryCode countryCode){
+    public ResponseEntity<List<String>> getTopTracksByArtist(@PathVariable("artistId") String artistId, @PathVariable CountryCode countryCode){
         try {
+            List<String> track_response = new ArrayList<String>();
+
+            // Check if we already have this artist, and if so, return a happy response and don't query spotify
+            List<Track> tracks = trackRepository.findTrackByArtistId(artistId);
+//            Artist artist = artistRepository.findArtistByArtistId(artistId);
+            if (!tracks.isEmpty()) {
+                for (Track track : tracks) {
+                    track_response.add(track.getTrackId());
+                }
+                return new ResponseEntity<>(
+                        track_response,
+                        HttpStatus.OK
+                );
+            }
+
             se.michaelthelin.spotify.model_objects.specification.Track[] tracks_response =
                     this.spotifyClient.getTopTracksByArtist_Sync(artistId, countryCode);
             for (se.michaelthelin.spotify.model_objects.specification.Track track : tracks_response) {
                 String trackId = track.getId();
+                track_response.add(trackId);
                 se.michaelthelin.spotify.model_objects.specification.AudioFeatures audioFeatures =
                         this.spotifyClient.getAudioFeaturesByTrackId_Sync(trackId);
                 trackRepository.save(new Track(
@@ -72,7 +92,10 @@ public class TrackController {
                         audioFeatures.getValence()
                 ));
             }
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(
+                    track_response,
+                    HttpStatus.CREATED
+            );
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
