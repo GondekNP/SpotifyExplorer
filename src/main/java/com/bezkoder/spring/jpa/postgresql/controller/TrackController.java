@@ -25,7 +25,9 @@ import com.bezkoder.spring.jpa.postgresql.model.Track;
 import com.bezkoder.spring.jpa.postgresql.repository.TrackRepository;
 import com.bezkoder.spring.jpa.postgresql.services.SpotifyClient;
 
-
+@CrossOrigin(origins = "http://localhost:8081")
+@RestController
+@RequestMapping("/api")
 public class TrackController {
 
     @Autowired
@@ -49,7 +51,7 @@ public class TrackController {
                         track.getDurationMs(),
                         track.getIsExplicit(),
                         track.getExternalUrls().get("spotify"),
-                        Arrays.asList(track.getAvailableMarkets()),
+                        Arrays.asList(Arrays.toString(track.getAvailableMarkets())),
                         track.getPopularity(),
                         track.getPreviewUrl(),
                         track.getTrackNumber(),
@@ -61,16 +63,16 @@ public class TrackController {
                         audioFeatures.getKey(),
                         audioFeatures.getLiveness(),
                         audioFeatures.getLoudness(),
-                        audioFeatures.getMode(),
+                        audioFeatures.getMode().getType(),
                         audioFeatures.getSpeechiness(),
                         audioFeatures.getTempo(),
                         audioFeatures.getTimeSignature(),
-                        audioFeatures.getType(),
+                        audioFeatures.getType().getType(), //for debugging
                         audioFeatures.getUri(),
                         audioFeatures.getValence()
                 ));
             }
-            return new ResponseEntity<>(tracks, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

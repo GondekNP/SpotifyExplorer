@@ -19,6 +19,14 @@ public class Artist {
   @Column(name = "artistId")
   private String artistId;
 
+  @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "artist_track",
+            joinColumns = @JoinColumn(name = "artist_id"),
+            inverseJoinColumns = @JoinColumn(name = "track_id")
+    )
+    private List<Track> tracks = new ArrayList<>();
+
   @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
   @CollectionTable(name = "genres", joinColumns = @JoinColumn(name = "genre_id"))
   @Column(name = "genre", nullable = false)

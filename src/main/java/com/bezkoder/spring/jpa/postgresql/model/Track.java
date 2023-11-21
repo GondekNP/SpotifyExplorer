@@ -16,9 +16,9 @@ public class Track {
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    private Album album;
 
-    @OneToMany(mappedBy = "track", fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "artistId")
-    private List<Artist> artists = new ArrayList<>();
+//    @OneToMany(mappedBy = "track", fetch = FetchType.EAGER, orphanRemoval = true)
+//    @JoinColumn(name = "artistId")
+//    private List<Artist> artists = new ArrayList<>();
 
     public Track(
             String trackId,
