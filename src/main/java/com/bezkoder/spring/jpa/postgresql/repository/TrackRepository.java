@@ -12,6 +12,6 @@ import com.bezkoder.spring.jpa.postgresql.model.Track;
 
 public interface TrackRepository extends JpaRepository<Track, Long> {
     List<Track> findTrackByTrackId(String trackId);
-    @Query("SELECT track_id FROM artist_track WHERE artist_id = :artist_id")
-    List<Track> findTracksByArtistId(@Param("artist_id") String artist_id);
+//    @Query("SELECT track_id FROM artist_track WHERE artist_id = :artist_id")
+//    List<Track> findTracksByArtistId(@Param("artist_id") String artist_id);
 }

@@ -43,13 +43,14 @@ public class TrackController {
     @GetMapping("/tracks/byArtist/{artistId}/{countryCode}")
     public ResponseEntity<List<String>> getTopTracksByArtist(@PathVariable("artistId") String artistId, @PathVariable CountryCode countryCode){
         try {
-            List<String> track_response = new ArrayList<String>();
+            // Check if we already have this artist, and if not, create artist
+            Artist _artist = artistRepository.findArtistByArtistId(artistId).get(0);
+            List<Track> _tracks = _artist.getTracks();
 
-            // Check if we already have this artist, and if so, return a happy response and don't query spotify
-            List<Track> tracks = trackRepository.findTrackByArtistId(artistId);
-//            Artist artist = artistRepository.findArtistByArtistId(artistId);
-            if (!tracks.isEmpty()) {
-                for (Track track : tracks) {
+            // If we already have the tracks for this artist, return those
+            List<String> track_response = new ArrayList<String>();
+            if (!_tracks.isEmpty()) {
+                for (Track track : _tracks) {
                     track_response.add(track.getTrackId());
                 }
                 return new ResponseEntity<>(
@@ -58,15 +59,19 @@ public class TrackController {
                 );
             }
 
+            // If we haven't returned yet, we need to get the tracks from spotify
             se.michaelthelin.spotify.model_objects.specification.Track[] tracks_response =
                     this.spotifyClient.getTopTracksByArtist_Sync(artistId, countryCode);
+
+            // For each track, get the audio features and save the track to our db
             for (se.michaelthelin.spotify.model_objects.specification.Track track : tracks_response) {
                 String trackId = track.getId();
                 track_response.add(trackId);
                 se.michaelthelin.spotify.model_objects.specification.AudioFeatures audioFeatures =
                         this.spotifyClient.getAudioFeaturesByTrackId_Sync(trackId);
-                trackRepository.save(new Track(
+                Track newTrack = new Track(
                         trackId,
+                        artistId,
                         track.getName(),
                         track.getDurationMs(),
                         track.getIsExplicit(),
@@ -90,7 +95,14 @@ public class TrackController {
                         audioFeatures.getType().getType(), //for debugging
                         audioFeatures.getUri(),
                         audioFeatures.getValence()
-                ));
+                );
+
+                trackRepository.save(newTrack);
+
+                // Before finishing each track, update the artist's list of tracks w/ this track
+                _artist.getTracks().add(newTrack);
+                artistRepository.save(_artist);
+
             }
             return new ResponseEntity<>(
                     track_response,

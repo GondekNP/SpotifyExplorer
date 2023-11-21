@@ -20,12 +20,12 @@ public class Artist {
   private String artistId;
 
   @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "artist_track",
-            joinColumns = @JoinColumn(name = "artist_id"),
-            inverseJoinColumns = @JoinColumn(name = "track_id")
-    )
-    private List<Track> tracks = new ArrayList<>();
+  @JoinTable(
+      name = "artist_track",
+      joinColumns = @JoinColumn(name = "artistId"),
+      inverseJoinColumns = @JoinColumn(name = "trackId")
+  )
+  private List<Track> tracks = new ArrayList<>();
 
   @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
   @CollectionTable(name = "genres", joinColumns = @JoinColumn(name = "genre_id"))
@@ -37,8 +37,6 @@ public class Artist {
   @Column(name = "imageUrl", nullable = false)
   private List<String> imageUrl = new ArrayList<>();
 
-  @Column(name = "published")
-  private boolean published;
 
   public Artist(String name, String artistId, List<String> genre, List<String> imageUrl) {
     this.name = name;
@@ -49,6 +47,14 @@ public class Artist {
 
   public Artist() {
 
+  }
+
+  public List<Track> getTracks() {
+    return this.tracks;
+  }
+
+  public void setTracks(List<Track> tracks) {
+      this.tracks = tracks;
   }
 
   public long getId() {

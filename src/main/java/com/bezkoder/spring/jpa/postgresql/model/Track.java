@@ -13,15 +13,12 @@ public class Track {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    private Album album;
-
-//    @OneToMany(mappedBy = "track", fetch = FetchType.EAGER, orphanRemoval = true)
-//    @JoinColumn(name = "artistId")
-//    private List<Artist> artists = new ArrayList<>();
+    @ManyToMany(mappedBy = "tracks", fetch = FetchType.EAGER)
+    private List<Artist> artists;
 
     public Track(
             String trackId,
+            String artistId,
             String name,
             int durationMs,
             boolean explicit,
@@ -47,6 +44,7 @@ public class Track {
             float valence
     ) {
         this.trackId = trackId;
+        this.artistId = artistId;
         this.name = name;
         this.durationMs = durationMs;
         this.explicit = explicit;
@@ -74,6 +72,9 @@ public class Track {
 
     @Column(name = "trackId")
     private String trackId;
+
+    @Column(name = "artistId")
+    private String artistId;
 
     @Column(name = "name")
     private String name;
