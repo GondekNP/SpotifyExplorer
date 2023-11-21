@@ -42,8 +42,33 @@ public class TrackController {
             for (se.michaelthelin.spotify.model_objects.specification.Track track : tracks_response) {
                 String trackId = track.getId();
                 se.michaelthelin.spotify.model_objects.specification.AudioFeatures audioFeatures =
-                        this.spotifyClient.getAudioFeaturesForTrack_Sync(trackId);
-
+                        this.spotifyClient.getAudioFeaturesByTrackId_Sync(trackId);
+                trackRepository.save(new Track(
+                        trackId,
+                        track.getName(),
+                        track.getDurationMs(),
+                        track.getIsExplicit(),
+                        track.getExternalUrls().get("spotify"),
+                        Arrays.asList(track.getAvailableMarkets()),
+                        track.getPopularity(),
+                        track.getPreviewUrl(),
+                        track.getTrackNumber(),
+                        audioFeatures.getAcousticness(),
+                        audioFeatures.getAnalysisUrl(),
+                        audioFeatures.getDanceability(),
+                        audioFeatures.getEnergy(),
+                        audioFeatures.getInstrumentalness(),
+                        audioFeatures.getKey(),
+                        audioFeatures.getLiveness(),
+                        audioFeatures.getLoudness(),
+                        audioFeatures.getMode(),
+                        audioFeatures.getSpeechiness(),
+                        audioFeatures.getTempo(),
+                        audioFeatures.getTimeSignature(),
+                        audioFeatures.getType(),
+                        audioFeatures.getUri(),
+                        audioFeatures.getValence()
+                ));
             }
             return new ResponseEntity<>(tracks, HttpStatus.OK);
         } catch (Exception e) {

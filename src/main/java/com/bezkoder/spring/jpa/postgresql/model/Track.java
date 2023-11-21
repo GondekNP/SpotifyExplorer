@@ -30,7 +30,6 @@ public class Track {
             int popularity,
             String previewUrl,
             int trackNumber,
-            boolean isLocal,
             float acousticness,
             String analysisUrl,
             float danceability,
@@ -56,7 +55,6 @@ public class Track {
         this.popularity = popularity;
         this.previewUrl = previewUrl;
         this.trackNumber = trackNumber;
-        this.isLocal = isLocal;
         this.acousticness = acousticness;
         this.analysisUrl = analysisUrl;
         this.danceability = danceability;
@@ -226,18 +224,6 @@ public class Track {
 
     public void setTrackNumber(int trackNumber) {
         this.trackNumber = trackNumber;
-    }
-
-    public boolean isIsLocal() {
-        return this.isLocal;
-    }
-
-    public boolean getIsLocal() {
-        return this.isLocal;
-    }
-
-    public void setIsLocal(boolean isLocal) {
-        this.isLocal = isLocal;
     }
 
     public float getAcousticness() {

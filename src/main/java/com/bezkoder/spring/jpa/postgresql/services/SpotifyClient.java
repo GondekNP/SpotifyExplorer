@@ -10,6 +10,8 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
+
 import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 import org.apache.hc.core5.http.ParseException;
@@ -81,6 +83,19 @@ public class SpotifyClient {
             final Artist artist = getArtistRequest.execute();
             System.out.println("Found artist: " + artist.getName());
             return artist;
+        }
+        catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public AudioFeatures getAudioFeaturesByTrackId_Sync(String trackId) {
+        ensureAccessToken();
+        try {
+            final AudioFeatures audioFeatures = spotifyApi.getAudioFeaturesForTrack(trackId).build().execute();
+            System.out.println("Found audio features for track: " + audioFeatures.getId());
+            return audioFeatures;
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
